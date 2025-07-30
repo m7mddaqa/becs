@@ -205,21 +205,21 @@ export default function Dashboard() {
       🚨 ניפוק חירום
     </button>
   </div>
-</div>
+  </div>
 
       {alert && <Alert type={alert.type} title={alert.title} message={alert.message} />}
 
       {showForm && <DonationForm onClose={() => setShowForm(false)} onRefresh={fetchDonations} setAlert={setAlert} />}
       {showDistributionForm && <RegularDistributionForm onDistribute={handleDistribute} />}
       {showEmergencyForm && <EmergencyDistributionForm onDistribute={handleDistribute} />}
-<ReplacementModal
-        isOpen={modalData.isOpen}
-        onConfirm={confirmReplacement}
-        onCancel={cancelReplacement}
-        originalType={modalData.originalType}
-        replacementType={modalData.replacementType}
-        options={modalData.options || []}
-      />
+      <ReplacementModal
+              isOpen={modalData.isOpen}
+              onConfirm={confirmReplacement}
+              onCancel={cancelReplacement}
+              originalType={modalData.originalType}
+              replacementType={modalData.replacementType}
+              options={modalData.options || []}
+            />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
         {bloodData.map((item) => (
           <div
@@ -251,7 +251,14 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-      
+      <div>
+  <br />
+  <img
+    src="/img1.png"
+    alt="Blood img"
+    className="mx-auto w-40 h-45 object-contain drop-shadow-md "
+  />
+</div>
     </div>
   );
 }
