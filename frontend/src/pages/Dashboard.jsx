@@ -152,48 +152,60 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 bg-gradient-to-b from-gray-100 to-white min-h-screen" dir="rtl">
-      <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
-        <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight shadow-sm">
-          מערכת ניהול בנק הדם הלאומי
-        </h1>
-        <div className="flex gap-2">
-          <button
-            className={`px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 ${showForm ? 'bg-blue-700' : 'bg-blue-600'} text-white hover:bg-opacity-90`}
-            onClick={() => {
-              setShowForm(true);
-              setShowDistributionForm(false);
-              setShowEmergencyForm(false);
-              setAlert(null);
-            }}
-          >
-            🧸 קליטת תרומות
-          </button>
+      <div className="text-center mb-6">
+  <img
+    src="/blood.png"
+    alt="Blood Logo"
+    className="mx-auto w-32 h-32 object-contain drop-shadow-md animate-pulse"
+  />
+  <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight shadow-sm mt-2">
+    מערכת ניהול בנק הדם הלאומי
+  </h1>
 
-          <button
-            className={`px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 ${showDistributionForm ? 'bg-blue-700' : 'bg-blue-500'} text-white hover:bg-opacity-90`}
-            onClick={() => {
-              setShowDistributionForm(true);
-              setShowForm(false);
-              setShowEmergencyForm(false);
-              setAlert(null);
-            }}
-          >
-            💙 ניפוק שגרתי
-          </button>
+  <div className="flex justify-center mt-6 gap-4 flex-wrap">
+    <button
+      className={`px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 ${
+        showForm ? "bg-blue-700" : "bg-blue-600"
+      } text-white hover:bg-opacity-90`}
+      onClick={() => {
+        setShowForm(true);
+        setShowDistributionForm(false);
+        setShowEmergencyForm(false);
+        setAlert(null);
+      }}
+    >
+      🧸 קליטת תרומות
+    </button>
 
-          <button
-            className={`px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 ${showEmergencyForm ? 'bg-red-700' : 'bg-red-600'} text-white hover:bg-opacity-90`}
-            onClick={() => {
-              setShowEmergencyForm(true);
-              setShowForm(false);
-              setShowDistributionForm(false);
-              setAlert(null);
-            }}
-          >
-            🚨 ניפוק חירום
-          </button>
-        </div>
-      </div>
+    <button
+      className={`px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 ${
+        showDistributionForm ? "bg-blue-700" : "bg-blue-500"
+      } text-white hover:bg-opacity-90`}
+      onClick={() => {
+        setShowDistributionForm(true);
+        setShowForm(false);
+        setShowEmergencyForm(false);
+        setAlert(null);
+      }}
+    >
+      💙 ניפוק שגרתי
+    </button>
+
+    <button
+      className={`px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 ${
+        showEmergencyForm ? "bg-red-700" : "bg-red-600"
+      } text-white hover:bg-opacity-90`}
+      onClick={() => {
+        setShowEmergencyForm(true);
+        setShowForm(false);
+        setShowDistributionForm(false);
+        setAlert(null);
+      }}
+    >
+      🚨 ניפוק חירום
+    </button>
+  </div>
+</div>
 
       {alert && <Alert type={alert.type} title={alert.title} message={alert.message} />}
 
