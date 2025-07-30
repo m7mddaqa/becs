@@ -33,3 +33,4 @@ class DistributeBloodView(APIView):
             {"message": f"✅ נופקו {quantity} מנות מסוג {blood_type}", "distribution": serializer.data},
             status=status.HTTP_201_CREATED
         )
+    
