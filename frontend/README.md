@@ -68,3 +68,25 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### To add autu blood :
+open console and paste:
+
+const types = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+
+types.forEach((type, i) => {
+  fetch("http://127.0.0.1:8000/api/donations/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      blood_type: type,
+      donor_name: `Test ${type}`,
+      donor_id: `${100000000 + i}`,
+      donation_date: today,
+    }),
+  }).then((res) =>
+    res.ok ? console.log(`✅ Added ${type}`) : console.warn(`❌ Error with ${type}`)
+  );
+});
