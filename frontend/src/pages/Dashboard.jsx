@@ -150,6 +150,65 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 5000);
   };
 
+
+  const handleExportAuditLog = async () => {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/export/audit-trail/", {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch audit trail");
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "audit_trail_log.pdf");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error("Error downloading PDF:", error);
+    setAlert({
+      type: "error",
+      title: "שגיאה ביצוא הלוג",
+      message: "לא הצלחנו לייצא את הלוג. נסה שוב מאוחר יותר.",
+    });
+    setTimeout(() => setAlert(null), 5000);
+  }
+};
+
+const handleExportAuditXML = async () => {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/export/audit-trail/xml/", {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch audit trail XML");
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "audit_trail_log.xml");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error("Error downloading XML:", error);
+    setAlert({
+      type: "error",
+      title: "שגיאה ביצוא XML",
+      message: "לא הצלחנו לייצא את הלוג. נסה שוב מאוחר יותר.",
+    });
+    setTimeout(() => setAlert(null), 5000);
+  }
+};
+
   return (
     <div className="p-6 bg-gradient-to-b from-gray-100 to-white min-h-screen" dir="rtl">
       <div className="text-center mb-6">
@@ -204,6 +263,20 @@ export default function Dashboard() {
     >
       🚨 ניפוק חירום
     </button>
+
+    <button
+  className="px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 bg-gray-700 text-white hover:bg-gray-800"
+  onClick={handleExportAuditLog}
+>
+  📝 ייצוא לוג פעילות PDF 
+</button>
+
+<button
+  className="px-4 py-2 rounded-lg shadow-md font-semibold tracking-tight flex items-center gap-2 transition-colors duration-200 bg-yellow-600 text-white hover:bg-yellow-700"
+  onClick={handleExportAuditXML}
+>
+  📄 ייצוא לוג XML
+</button>
   </div>
   </div>
 
