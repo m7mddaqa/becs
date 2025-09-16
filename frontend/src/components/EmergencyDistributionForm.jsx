@@ -4,7 +4,8 @@ export default function EmergencyDistributionForm({ onDistribute }) {
   const [oMinusUnits, setOMinusUnits] = useState(0);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/donations/")
+    const token = localStorage.getItem('token');
+    fetch("http://127.0.0.1:8000/api/donations/", { headers: { 'Authorization': `Token ${token}` }})
       .then((res) => res.json())
       .then((data) => {
         const count = data.filter((item) => item.blood_type === "O-").length;

@@ -1,3 +1,17 @@
+# Add missing import for APIView
+from rest_framework.views import APIView
+from .serializers import PublicRegistrationSerializer
+# Public registration view (no auth required, role is always 'staff')
+from rest_framework.permissions import AllowAny
+class PublicRegistrationView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PublicRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Account created successfully.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,14 +21,44 @@ from reportlab.pdfgen import canvas
 from xml.etree.ElementTree import Element, tostring
 import xml.dom.minidom
 
+from rest_framework import permissions, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import UserRegistrationSerializer
+from .models import UserProfile
+from django.contrib.auth.models import User
+
+# Only Admins can create users
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and hasattr(request.user, 'userprofile') and request.user.userprofile.role == 'admin'
+
+class UserRegistrationView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User created successfully.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 from django.utils.timezone import now
 from .models import Donation, Distribution, AuditTrail
-from .serializers import DonationSerializer, DistributionSerializer
+from .serializers import DonationSerializer, DistributionSerializer, DonationDeidentifiedSerializer, CurrentUserProfileSerializer
+from .permissions import ReadOnlyForResearchers
 
 
 class DonationViewSet(viewsets.ModelViewSet):
     queryset = Donation.objects.all()
-    serializer_class = DonationSerializer
+    permission_classes = [ReadOnlyForResearchers]
+
+    def get_serializer_class(self):
+        user = self.request.user
+        role = getattr(getattr(user, 'userprofile', None), 'role', None)
+        if role == 'researcher':
+            return DonationDeidentifiedSerializer
+        return DonationSerializer
 
     def perform_create(self, serializer):
         donation = serializer.save()
@@ -26,6 +70,7 @@ class DonationViewSet(viewsets.ModelViewSet):
 
 
 class DistributeBloodView(APIView):
+    permission_classes = [ReadOnlyForResearchers]
     def post(self, request):
         blood_type = request.data.get("blood_type")
         quantity = int(request.data.get("quantity", 0))
@@ -58,6 +103,7 @@ class DistributeBloodView(APIView):
 
 
 class ExportAuditTrailPDF(APIView):
+    permission_classes = [IsAdmin]
     def get(self, request):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="audit_trail.pdf"'
@@ -87,6 +133,7 @@ class ExportAuditTrailPDF(APIView):
 
 
 class ExportAuditTrailXMLView(APIView):
+    permission_classes = [IsAdmin]
     def get(self, request):
         logs = AuditTrail.objects.order_by('-timestamp')
 
@@ -123,3 +170,24 @@ class ExportAuditTrailXMLView(APIView):
 
         xml_str = xml.dom.minidom.parseString(tostring(root)).toprettyxml(indent="  ")
         return HttpResponse(xml_str, content_type='application/xml')
+
+
+class CurrentUserProfileView(APIView):
+    def get(self, request):
+        profile = getattr(request.user, 'userprofile', None)
+        if not profile:
+            return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        data = CurrentUserProfileSerializer(profile).data
+        return Response(data)
+
+
+class ResearchDonationsList(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        role = getattr(getattr(request.user, 'userprofile', None), 'role', None)
+        if role != 'researcher':
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+        donations = Donation.objects.all().only('blood_type', 'donation_date')
+        data = DonationDeidentifiedSerializer(donations, many=True).data
+        return Response(data)

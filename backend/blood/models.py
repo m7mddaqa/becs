@@ -1,6 +1,21 @@
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+
+# UserProfile to extend User with role
+class UserProfile(models.Model):
+    ROLE_CHOICES = [
+        ("admin", "Admin"),
+        ("staff", "Staff"),
+        ("researcher", "Researcher"),
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    unique_id = models.CharField(max_length=32, unique=True)
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_role_display()})"
 
 class Donation(models.Model):
     BLOOD_TYPES = [

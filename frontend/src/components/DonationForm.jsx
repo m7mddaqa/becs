@@ -27,9 +27,10 @@ export default function DonationForm({ onClose, onRefresh, setAlert }) {
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch("http://127.0.0.1:8000/api/donations/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 'Authorization': `Token ${token}` },
         body: JSON.stringify(formData),
       });
 

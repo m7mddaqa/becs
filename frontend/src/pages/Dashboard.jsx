@@ -42,7 +42,10 @@ export default function Dashboard() {
   }, []);
 
   const fetchDonations = () => {
-    fetch("http://127.0.0.1:8000/api/donations/")
+    const token = localStorage.getItem('token');
+    fetch("http://127.0.0.1:8000/api/donations/", {
+      headers: { 'Authorization': `Token ${token}` }
+    })
       .then((res) => res.json())
       .then((data) => {
         setDonations(data);
@@ -67,9 +70,10 @@ export default function Dashboard() {
 
   const performDistribution = async (usedType, quantity, originalType = null) => {
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch("http://127.0.0.1:8000/api/distribute/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 'Authorization': `Token ${token}` },
         body: JSON.stringify({ blood_type: usedType, quantity }),
       });
 
@@ -153,8 +157,10 @@ export default function Dashboard() {
 
   const handleExportAuditLog = async () => {
   try {
+    const token = localStorage.getItem('token');
     const res = await fetch("http://127.0.0.1:8000/api/export/audit-trail/", {
       method: "GET",
+      headers: { 'Authorization': `Token ${token}` },
     });
 
     if (!res.ok) {
@@ -182,8 +188,10 @@ export default function Dashboard() {
 
 const handleExportAuditXML = async () => {
   try {
+    const token = localStorage.getItem('token');
     const res = await fetch("http://127.0.0.1:8000/api/export/audit-trail/xml/", {
       method: "GET",
+      headers: { 'Authorization': `Token ${token}` },
     });
 
     if (!res.ok) {
